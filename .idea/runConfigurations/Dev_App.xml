@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Dev-App" type="js.build_tools.npm" factoryName="npm">
+    <package-json value="$PROJECT_DIR$/WebApp/package.json" />
+    <command value="run-script" />
+    <scripts>
+      <script value="build" />
+    </scripts>
+    <arguments value="--watch" />
+    <node-interpreter value="project" />
+    <envs />
+    <method />
+  </configuration>
+</component>
