@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NodeSMA.iml" filepath="$PROJECT_DIR$/NodeSMA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WebApp/WebApp.iml" filepath="$PROJECT_DIR$/WebApp/WebApp.iml" />
     </modules>
   </component>
 </project>

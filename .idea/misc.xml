@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="GradleLocalSettings">
-    <option name="modificationStamps">
-      <map>
-        <entry key="$PROJECT_DIR$/../Android/TownMap" value="4409327523000" />
-        <entry key="$PROJECT_DIR$/../Android/TownMap2" value="4410467731000" />
-      </map>
-    </option>
-    <option name="externalProjectsViewState">
-      <projects_view />
-    </option>
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <type id="Python" />
   </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
