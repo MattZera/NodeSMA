@@ -2,6 +2,12 @@
   <configuration default="false" name="Dev-Server" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" path-to-js-file="bin/www" working-dir="$PROJECT_DIR$">
     <envs>
       <env name="DEBUG" value="Server:*" />
+      <env name="DEBUG2" value="NodeSMA:*" />
+      <env name="TWITTER_CONSUMER_KEY" value="lRNbtXMgFkOMGaas7pWc6ffkr" />
+      <env name="TWITTER_CONSUMER_SECRET" value="USUKthnsgoLSHvq7I14KOMuADIqeDJNafcx21xKhCxzHIn4HWz" />
+      <env name="TWITTER_ACCESS_TOKEN_KEY" value="33839528-Y2RLcBWtgO0BDg25xUarQ6ziIfeWVKySACFjINgLB" />
+      <env name="TWITTER_ACCESS_TOKEN_SECRET" value="be1aMDTnZ6x53vvHs4kNL6OIBxVuXjS8N5MzA9lNgXuHv" />
+      <env name="TWITTER_BEARER_TOKEN" value="AAAAAAAAAAAAAAAAAAAAAHzZzQAAAAAA3d%2FRpNR3dF39ELtzbkhieaGSh%2F8%3Djw2jKhNba6psfdH3qzEUcZWBiFWj7MHJMOQTQ9V5QgLWfSzlvv" />
     </envs>
     <profiling v8-profiler-path="" />
     <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSProfilingRunConfigurationExtension">
