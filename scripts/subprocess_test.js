@@ -18,12 +18,16 @@ var client = new Twitter({
 });
 
 
+var launchAnalyser = function(data, callback){
+    cp.exec('python3', ['analyser_vader.py', JSON.stringify(data) ], callback);
+};
+
 
 // Install NLTK data
-execFileSync('python3', ['nltk_data_install.py']);
+// execFileSync('python3', ['nltk_data_install.py']);
 
-// Create execFileObservable from execFile
-var execFileObservable = Rx.Observable.bindNodeCallback(execFile);
+//Create execFileObservable from execFile
+var execFileObservable = Rx.Observable.bindNodeCallback(cp.execFile);
 
 
 var trackTermsSubject = new Rx.BehaviorSubject("angela merkel");
@@ -32,11 +36,16 @@ var streamObservable = trackTermsSubject
     .switchMap(
         term => Rx.Observable.fromEvent(client.stream('statuses/filter', {track:term, language: "en", stall_warnings: true}), 'data'));
 
+var env = Object.create( process.env );
+env.NLTK_DATA = __dirname+'/nltk_data';
 
+// '-W ignore'
 
 var streamAnalysis = streamObservable
-    .flatMap(string => execFileObservable('python3', ['-W ignore', 'analyser.py', string]), (x, y, ix, iy) => { return "compound:"+JSON.parse(y[0]).compound+"-->"+x.text});
+    .flatMap(data => execFileObservable('python3', ['analyser_vader.py', JSON.stringify(data.text) ]), (x, y, ix, iy) => { return y[0]});
 
 
 
-streamAnalysis.subscribe(data => console.log(data.toString()));
+streamAnalysis.subscribe(data => console.log(data));
+
+//execFile(__dirname+'/analyser_vader.py', [ "@TwitchSharer: I'm entering to win a Nintendo switch #giveaway #nintendo #twitch #nintendo"], (err,stdout,stderr)=>console.log(stdout));
