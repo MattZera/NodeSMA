@@ -10,12 +10,16 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { AnalysisComponent } from './analysis/analysis.component';
 
+import { SocketService } from "./services/socket.service";
+import { LiveStreamComponent } from './live-stream/live-stream.component';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    AnalysisComponent
+    AnalysisComponent,
+    LiveStreamComponent
   ],
   imports: [
     BrowserModule,
@@ -24,7 +28,7 @@ import { AnalysisComponent } from './analysis/analysis.component';
     HttpModule,
     CollapseModule
   ],
-  providers: [],
+  providers: [SocketService],
   bootstrap: [AppComponent]
 })
 

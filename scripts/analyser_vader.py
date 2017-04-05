@@ -30,7 +30,7 @@ def main():
     sid = SentimentIntensityAnalyzer()
     sentimentScores = sid.polarity_scores(data)
 
-    sys.stdout.write(str(sentimentScores))
+    sys.stdout.write(json.dumps(sentimentScores))
     return 0
 
 if __name__ == '__main__':

@@ -4,10 +4,13 @@
  * Module dependencies.
  */
 
+const Rx = require('rxjs/Rx');
 var app = require('../app');
 var debug = require('debug')('nodesma:server');
 var http = require('http');
 var socket = require('../socket');
+var searcher = require('../searcher');
+
 
 /**
  * Get port from environment and store in Express.
