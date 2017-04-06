@@ -1,8 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Dev-Server" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" path-to-js-file="bin/www" working-dir="$PROJECT_DIR$">
     <envs>
-      <env name="DEBUG" value="Server:*" />
-      <env name="DEBUG2" value="NodeSMA:*" />
+      <env name="DEBUG" value="NodeSMA:*" />
       <env name="TWITTER_CONSUMER_KEY" value="lRNbtXMgFkOMGaas7pWc6ffkr" />
       <env name="TWITTER_CONSUMER_SECRET" value="USUKthnsgoLSHvq7I14KOMuADIqeDJNafcx21xKhCxzHIn4HWz" />
       <env name="TWITTER_ACCESS_TOKEN_KEY" value="33839528-Y2RLcBWtgO0BDg25xUarQ6ziIfeWVKySACFjINgLB" />

@@ -5,11 +5,9 @@ import { HttpModule } from '@angular/http';
 import { CollapseModule } from 'ng2-bootstrap/collapse'
 
 import { routing } from "./app.routing";
-
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { AnalysisComponent } from './analysis/analysis.component';
-
 import { SocketService } from "./services/socket.service";
 import { LiveStreamComponent } from './live-stream/live-stream.component';
 

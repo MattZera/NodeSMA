@@ -5,6 +5,7 @@
 
 var Rx = require('rxjs/Rx');
 const cp = require('child_process');
+const LRUMap = require('lru_map').LRUMap;
 const execFile = cp.execFile;
 const execFileSync = cp.execFileSync;
 var Twitter = require('twitter');
@@ -21,22 +22,16 @@ var client = new Twitter({
 // execFileSync('python3', ['nltk_data_install.py']);
 
 const MAX_TRACKED_PHRASES = 400;
-var tracked_phrases = [];
+var termMap = new LRUMap(MAX_TRACKED_PHRASES);
 
-var trackPhrasesSubject = new Rx.Subject().debounce(()=>Rx.Observable.timer(60000));
-
-function addPhrase(phrase){
-    tracked_phrases.push(phrase);
-    if(tracked_phrases.length > MAX_TRACKED_PHRASES) tracked_phrases.shift();
-    trackPhrasesSubject.next(tracked_phrases);
-}
-
-//Create execFileObservable from execFile
-var execFileObservable = Rx.Observable.bindNodeCallback(cp.execFile);
-
+var trackPhrasesSubject = (new Rx.Subject()).map(term=>{
+    termMap.set(term,true);
+    return Array.from(termMap.keys());
+});
 
 //switchmap the observable which tracks the terms via the twitter api
 var streamObservable = trackPhrasesSubject
+    .debounce(()=>Rx.Observable.timer(100))
     .switchMap(
         terms =>
             Rx.Observable.fromEvent(
@@ -55,6 +50,11 @@ var tweetStreamObservable = streamObservable.refCount().filter(data => data.hasO
 var warningStreamObservable = streamObservable.filter(data => data.hasOwnProperty('warning'));
 var limitStreamObservable = streamObservable.filter(data => data.hasOwnProperty('limit'));
 
+
+
+//Create execFileObservable from execFile
+var execFileObservable = Rx.Observable.bindNodeCallback(cp.execFile);
+
 //launch a python process to analyze each tweet and flatmap the returns to the same observable
 var streamAnalysis = tweetStreamObservable
     .concatMap(
@@ -70,7 +70,7 @@ var phrase_streams = {};
 function getStreamForPhrase(phrase){
     if (!phrase_streams[phrase]){
         phrase_streams[phrase] = Rx.Observable.defer(() => {
-                Rx.Observable.timer(100).subscribe(()=>addPhrase(phrase));
+                trackPhrasesSubject.next(phrase);
                 return streamAnalysis.filter(data => data[0].text.toLowerCase().includes(phrase.toLowerCase()))
             }
         ).share();
@@ -83,30 +83,30 @@ warningStreamObservable.subscribe(data => console.error("Warning: " + data["warn
 //limitStreamObservable.subscribe(data => console.error("Limit: " + data["limit"]["track"]));
 
 
-// streamAnalysis.subscribe(data => {
-//     var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
-//     return console.log('\x1b[36m%s\x1b[0m', mystring);
-// });
-
-getStreamForPhrase("trump").subscribe(data => {
-    var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
-    return console.log('\x1b[31m%s\x1b[0m', mystring);
-});
-
-getStreamForPhrase("nintendo").subscribe(data => {
-    var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
-    return console.log('\x1b[33m%s\x1b[0m:', mystring);
-});
-
-getStreamForPhrase("obama").subscribe(data => {
+streamAnalysis.subscribe(data => {
     var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
     return console.log('\x1b[36m%s\x1b[0m', mystring);
 });
 
-getStreamForPhrase("twitter").subscribe(data => {
-    var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
-    return console.log('%s', mystring);
-});
+// getStreamForPhrase("trump").subscribe(data => {
+//     var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
+//     return console.log('\x1b[31m%s\x1b[0m', mystring);
+// });
+//
+// getStreamForPhrase("nintendo").subscribe(data => {
+//     var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
+//     return console.log('\x1b[33m%s\x1b[0m:', mystring);
+// });
+//
+// getStreamForPhrase("obama").subscribe(data => {
+//     var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
+//     return console.log('\x1b[36m%s\x1b[0m', mystring);
+// });
+//
+// getStreamForPhrase("twitter").subscribe(data => {
+//     var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
+//     return console.log('%s', mystring);
+// });
 
 // addPhrase("nintendo");
 //
@@ -118,8 +118,8 @@ getStreamForPhrase("twitter").subscribe(data => {
 //     ()=>addPhrase("obamacare")
 // );
 
-// addPhrase("obama");
-// addPhrase("trump");
-// addPhrase("nintendo");
-// addPhrase("twitter");
-// addPhrase("cnn");
+trackPhrasesSubject.next("obama");
+trackPhrasesSubject.next("trump");
+trackPhrasesSubject.next("nintendo");
+trackPhrasesSubject.next("twitter");
+trackPhrasesSubject.next("cnn");

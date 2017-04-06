@@ -1,2 +1,8 @@
 <div class="container">
+  <h1>Tweets Right Now</h1>
+  <div id="tweetBox">
+    <div *ngFor="let tweet of tweets | async">
+      {{tweet.text}}
+    </div>
+  </div>
 </div> <!-- /container -->

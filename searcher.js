@@ -6,13 +6,15 @@ var Rx = require('rxjs/Rx');
 const cp = require('child_process');
 const searcher = cp.fork(`${__dirname}/searcher_subprocess.js`);
 
-exports.send = function(data) {
-    searcher.send(data);
+function send(message, data) {
+    searcher.send({message:message,data:data});
 };
 
-const messageObservable = Rx.Observable.defer(()=>{
-    Rx.Observable.fromEvent(searcher, 'message');
-}).share();
+var messageObservable = Rx.Observable.fromEvent(searcher, 'message');
+
+exports.startStream = ()=>send("start_stream");
+exports.stopStream = ()=>send("stop_stream");
+exports.search = (term)=>send("search",term);
 
 exports.disconnect = function(){
     searcher.disconnect();
