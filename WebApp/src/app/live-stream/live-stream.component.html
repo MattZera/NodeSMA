@@ -1,8 +1,11 @@
 <div class="container">
   <h1>Tweets Right Now</h1>
-  <div id="tweetBox">
-    <div *ngFor="let tweet of tweets | async">
-      {{tweet.text}}
+  <div *ngFor="let tweet of tweets | async" class="card card-inverse card-primary mb-3 text-center">
+    <div class="card-block">
+      <blockquote class="card-blockquote">
+        <p>{{tweet.text}}</p>
+      </blockquote>
     </div>
   </div>
 </div> <!-- /container -->
+

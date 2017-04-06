@@ -1,27 +1,30 @@
-<nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
-  <button class="navbar-toggler navbar-toggler-right" type="button" (click)="isMenuCollapsed = !isMenuCollapsed">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <a class="navbar-brand" href="#">{{title}}</a>
+<div id="app-container">
+  <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+    <button class="navbar-toggler navbar-toggler-right" type="button" (click)="isMenuCollapsed = !isMenuCollapsed">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="#">{{title}}</a>
 
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault" [collapse]="isMenuCollapsed">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/" (click)="isMenuCollapsed = true">Home</a>
-      </li>
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" routerLink="/live-stream" (click)="isMenuCollapsed = true">Live Stream</a>
-      </li>
-    </ul>
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault" [collapse]="isMenuCollapsed">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item" routerLinkActive="active">
+          <a class="nav-link" routerLink="/" (click)="isMenuCollapsed = true">Home</a>
+        </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a class="nav-link" routerLink="/live-stream" (click)="isMenuCollapsed = true">Live Stream</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <router-outlet></router-outlet>
+
+  <div class="container">
+    <footer>
+      <p>&copy; Company 2017</p>
+    </footer>
   </div>
-</nav>
-
-<router-outlet></router-outlet>
-
-<div class="container">
-  <footer>
-    <p>&copy; Company 2017</p>
-  </footer>
 </div>
+
 
 
