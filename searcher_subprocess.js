@@ -66,7 +66,7 @@ var streamAnalysis = streamObservable
     })
     .concatMap(
         data => execFileObservable(
-            'python',
+            'python3',
             ['-W ignore', 'scripts/analyser_textblob.py', JSON.stringify(data.text) ]
         ),
         (x, y, ix, iy) => { x.sentiment = JSON.parse(y[0]); return x}
