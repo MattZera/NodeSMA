@@ -18,7 +18,7 @@ var client = new Twitter({
 });
 
 // Install NLTK data
-cp.execFileSync('python3', ['scripts/nltk_data_install.py']);
+//cp.execFileSync('python3', ['scripts/nltk_data_install.py']);
 
 const MAX_TRACKED_PHRASES = 400;
 var termMap = new LRUMap(MAX_TRACKED_PHRASES);
