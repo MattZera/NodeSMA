@@ -129,4 +129,4 @@ crashlytics-build.properties
 fabric.properties
 
 #nltk
-/scripts/nltk_data
+/scripts/nltk_data/*
