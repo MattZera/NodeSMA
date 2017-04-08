@@ -17,6 +17,9 @@ var client = new Twitter({
     //bearer_token: process.env.TWITTER_BEARER_TOKEN
 });
 
+// Install NLTK data
+execFileSync('python3', ['nltk_data_install.py']);
+
 const MAX_TRACKED_PHRASES = 400;
 var termMap = new LRUMap(MAX_TRACKED_PHRASES);
 
@@ -63,7 +66,7 @@ var streamAnalysis = streamObservable
     })
     .concatMap(
         data => execFileObservable(
-            'python3',
+            'python',
             ['-W ignore', 'scripts/analyser_textblob.py', JSON.stringify(data.text) ]
         ),
         (x, y, ix, iy) => { x.sentiment = JSON.parse(y[0]); return x}
