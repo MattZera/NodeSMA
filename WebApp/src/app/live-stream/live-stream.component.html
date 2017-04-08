@@ -1,10 +1,15 @@
 <div class="container">
   <h1>Tweets Right Now</h1>
-  <div *ngFor="let tweet of tweets | async" class="card card-inverse card-primary mb-3 text-center">
-    <div class="card-block">
-      <blockquote class="card-blockquote">
-        <p>{{tweet.text}}</p>
-      </blockquote>
+  <div id="tweetBox">
+    <div *ngFor="let tweet of tweets | async"
+         [class.card-success]="tweet.sentiment.compound > 0"
+         [class.card-danger]="tweet.sentiment.compound < 0"
+         [class.card-primary]="tweet.sentiment.compound == 0"
+         class="card mb-3 text-center card-inverse">
+      <div class="card-block">
+        <h3 class="card-title">@{{tweet.user.screen_name}}</h3>
+        <p class="card-text">{{ tweet.text }}</p>
+      </div>
     </div>
   </div>
 </div> <!-- /container -->

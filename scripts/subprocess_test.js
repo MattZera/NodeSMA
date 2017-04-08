@@ -62,7 +62,7 @@ var streamAnalysis = tweetStreamObservable
             'python3',
             ['-W ignore', 'analyser_vader.py', JSON.stringify(data.text) ]
         ),
-        (x, y, ix, iy) => { return [x, JSON.parse(y[0])]}
+        (x, y, ix, iy) => { x.sentiment = JSON.parse(y[0]); return x}
         ).share();
 
 
@@ -84,8 +84,9 @@ warningStreamObservable.subscribe(data => console.error("Warning: " + data["warn
 
 
 streamAnalysis.subscribe(data => {
-    var mystring = "score:"+data[1]["compound"]+" Text:"+data[0].text;
-    return console.log('\x1b[36m%s\x1b[0m', mystring);
+    var mystring = "score:"+data.sentiment["compound"]+" Text:"+data;
+    //console.log('\x1b[36m%s\x1b[0m', mystring);
+    console.log(data);
 });
 
 // getStreamForPhrase("trump").subscribe(data => {

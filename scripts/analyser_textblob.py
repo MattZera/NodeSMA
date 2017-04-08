@@ -28,6 +28,7 @@ def clean_tweet(tweet):
 
 def main():
 # Go over each line of stdin and flush after each write
+
     data = sys.argv[len(sys.argv)-1]
     sentimentScores = TextBlob(clean_tweet(data))
 

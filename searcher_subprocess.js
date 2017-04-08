@@ -2,9 +2,11 @@
  * Created by Zera on 3/23/17.
  */
 
+const cp = require('child_process');
 const Rx = require('rxjs/Rx');
 const Twitter = require('twitter');
 const LRUMap = require('lru_map').LRUMap;
+
 
 //Twitter access credentials must be provided as runtime variables
 var client = new Twitter({
@@ -41,6 +43,32 @@ var streamObservable = trackPhrasesSubject
     ).share(); //publish to only allow one stream
 
 
+//Create execFileObservable from execFile
+var execFileObservable = Rx.Observable.bindNodeCallback(cp.execFile);
+
+//launch a python process to analyze each tweet and flatmap the returns to the same observable
+var streamAnalysis = streamObservable
+    .filter(tweet=>
+    typeof tweet.contributors == 'object' &&
+    typeof tweet.id_str == 'string' &&
+    typeof tweet.text == 'string')//make sure its a tweet before sending it
+    .map(tweet=>{
+        return {
+            text:tweet.truncated == true ? tweet.extended_tweet.full_text : tweet.text,
+            user:{
+                name:tweet.user.name,
+                screen_name:tweet.user.screen_name
+            }
+        };
+    })
+    .concatMap(
+        data => execFileObservable(
+            'python3',
+            ['-W ignore', 'scripts/analyser_textblob.py', JSON.stringify(data.text) ]
+        ),
+        (x, y, ix, iy) => { x.sentiment = JSON.parse(y[0]); return x}
+    ).share();
+
 var streamSubscription;
 
 function send(message, data){
@@ -53,7 +81,7 @@ messages.subscribe(message=>{
     switch (message.message){
         case "start_stream":
             if (streamSubscription) break;
-            var streamSubscription = streamObservable.subscribe(data=>{
+            var streamSubscription = streamAnalysis.subscribe(data=>{
                 process.send({message:"tweet",data:data});
             });
             send('stream_started');
