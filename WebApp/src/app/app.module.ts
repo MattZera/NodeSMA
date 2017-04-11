@@ -10,6 +10,7 @@ import { HomeComponent } from './home/home.component';
 import { AnalysisComponent } from './analysis/analysis.component';
 import { SocketService } from "./services/socket.service";
 import { LiveStreamComponent } from './live-stream/live-stream.component';
+import { LaTimesComponent } from './la-times/la-times.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { LiveStreamComponent } from './live-stream/live-stream.component';
     AppComponent,
     HomeComponent,
     AnalysisComponent,
-    LiveStreamComponent
+    LiveStreamComponent,
+    LaTimesComponent
   ],
   imports: [
     BrowserModule,

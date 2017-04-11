@@ -52,7 +52,7 @@ export class SocketService implements OnDestroy{
     return this.connections[label];
   }
 
-  public send(label:string, data: any){
+  public send(label:string, data: any = {}){
     this.sendSubject.next({label:label,data:data});
   }
 
