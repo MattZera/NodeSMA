@@ -5,36 +5,80 @@
 const cp = require('child_process');
 const Rx = require('rxjs/Rx');
 const Twitter = require('twitter');
-const LRUMap = require('lru_map').LRUMap;
+const LRUCache = require("lru-cache");
+//const db = require('../database')('mongodb://localhost:27017/SMA');
 
+//
+//Twitter Api
+//
 
 //Twitter access credentials must be provided as runtime variables
-var client = new Twitter({
+
+//Stream client for user streams
+var streamClient = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
     access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
     access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
-    //bearer_token: process.env.TWITTER_BEARER_TOKEN
 });
 
-// Install NLTK data
-//cp.execFileSync('python3', ['scripts/nltk_data_install.py']);
+//Search client for app search
+var searchClient = new Twitter({
+    consumer_key: process.env.TWITTER_CONSUMER_KEY,
+    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+    bearer_token: process.env.TWITTER_BEARER_TOKEN
+});
+
+//
+//LRU Map
+//
 
 const MAX_TRACKED_PHRASES = 400;
-var termMap = new LRUMap(MAX_TRACKED_PHRASES);
 
-var trackPhrasesSubject = (new Rx.Subject()).map(term=>{
-    termMap.set(term,true);
-    return Array.from(termMap.keys());
-});
+var lru_options = {
+    max: MAX_TRACKED_PHRASES,
+    //length: function (n, key) { return 1 },
+    //dispose: function (key, n) { n.close() },
+    maxAge: 1000 * 60 * 60 // 1 hour
+};
 
-//The Twitter Stream
-var streamObservable = trackPhrasesSubject
-    .debounce(()=>Rx.Observable.timer(100))
+var termMap = new LRUCache(lru_options);
+
+//
+//Phrase Stream
+//
+
+//subject for injecting trends manually
+var trackPhrasesSubject = new Rx.Subject();
+
+//the trending phrases in the US every 15 seconds
+var trendingPhrases = Rx.Observable.interval(15000)
+    .switchMapTo(searchClient.get('trends/place',{id:23424977}))
+    .concatMap(data=>Rx.Observable.from(data[0].trends))
+    .map(trend=>trend.name);
+
+//combined stream of phrases exported to a list from the lru-cache
+var phrasesListStream = Rx.Observable
+    .from([trackPhrasesSubject,trendingPhrases])
+    .flatMap(x=>x,(stream, term, streamNum,termNum)=>{
+        var maxAge = streamNum == 1 ? 1000 * 60 * 60 : undefined;
+        termMap.set(term, true, maxAge);
+
+        return termMap.keys();
+    });
+
+//
+//Twitter stream
+//
+
+//start the twitter stream
+var streamObservable = phrasesListStream
+    .sample(Rx.Observable.interval(1000 * 60 * 15).startWith(0))
+    .distinctUntilChanged()
     .switchMap(
         terms =>
             Rx.Observable.fromEvent(
-                client.stream('statuses/filter',
+                streamClient.stream('statuses/filter',
                     {
                         track:terms.toString(), //Array tostring naturally inserts a ',' between strings
                         language: "en",
@@ -43,27 +87,30 @@ var streamObservable = trackPhrasesSubject
                     }),
                 'data'
             )
-    ).share(); //publish to only allow one stream
+    ).publish(); //publish to only allow one stream
+
+var tweetStream = streamObservable.refCount().filter(tweet=> typeof tweet.text == 'string');
+//var messageStream = streamObservable.filter(tweet => tweet.text == undefined).subscribe(message=>console.error(message));
 
 
 //Create execFileObservable from execFile
 var execFileObservable = Rx.Observable.bindNodeCallback(cp.execFile);
 
 //launch a python process to analyze each tweet and flatmap the returns to the same observable
-var streamAnalysis = streamObservable
-    .filter(tweet=>
-    typeof tweet.contributors == 'object' &&
-    typeof tweet.id_str == 'string' &&
-    typeof tweet.text == 'string')//make sure its a tweet before sending it
+var streamAnalysis = tweetStream
     .map(tweet=>{
+
+        var text = tweet.truncated == true ? tweet.extended_tweet.full_text : tweet.text
+
         return {
-            text:tweet.truncated == true ? tweet.extended_tweet.full_text : tweet.text,
+            text:text,
             user:{
                 name:tweet.user.name,
                 screen_name:tweet.user.screen_name
             }
         };
     })
+    //Todo: figure out a way to analyse more than one at once
     .concatMap(
         data => execFileObservable(
             'python3',
@@ -74,10 +121,16 @@ var streamAnalysis = streamObservable
 
 var streamSubscription;
 
+
+//
+//Messaages
+//
+
 function send(message, data){
     process.send({message:message, data:data});
 }
 
+//handle messages to and from the process
 var messages = Rx.Observable.fromEvent(process, 'message');
 messages.subscribe(message=>{
     console.log('subprocess message: ' + message.message);
@@ -88,7 +141,8 @@ messages.subscribe(message=>{
                 process.send({message:"tweet",data:data});
             });
             send('stream_started');
-            trackPhrasesSubject.next('trump');
+            trackPhrasesSubject.next('twitter');
+
             break;
         case "stop_stream":
             if (!streamSubscription) break;
@@ -97,5 +151,4 @@ messages.subscribe(message=>{
         default:
             break;
     }
-
 });

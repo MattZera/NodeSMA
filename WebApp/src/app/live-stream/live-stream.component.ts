@@ -16,9 +16,10 @@ export class LiveStreamComponent implements OnInit, OnDestroy{
 
   ngOnInit() {
     this.tweets = this.socket.messages('tweet')
+      .sample(Observable.interval(2000))
       .scan((array: Array<any>,tweet: string)=>{
         array.unshift(tweet);
-        if( array.length > 1000) array.pop();
+        if( array.length > 500) array.pop();
           return array
       }, []);
   }

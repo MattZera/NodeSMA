@@ -5,7 +5,7 @@
 var TERM_SEARCH_LIMIT = 86400;// 1 day
 
 var Rx = require('rxjs/Rx');
-var db = require('../database')('mongodb://localhost:27017/DMWebTool');
+
 
 var messageObservable = Rx.Observable.fromEvent(process, "message");
 
