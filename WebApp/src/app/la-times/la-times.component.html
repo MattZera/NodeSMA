@@ -1,6 +1,40 @@
 
 
+<!--dataset += '<div class="news"><h3>' + data[i].title +-->
+  <!--'</h3><p><b>Date:</b> ' + data[i].date + '<br><b>Publisher:</b> ' +-->
+  <!--data[i].author + '<br><b>Link:</b> <a href=' + data[i].link + '>' + data[i].link +-->
+    <!--'</a><br><b>Sentimental polarity of this article:</b> ' + data[i].polarity + '</p>';-->
 
-<p>
-  {{ timesData }}
-</p>
+<div class="container">
+  <h1>LA Times</h1>
+  <hr>
+  <h2>Chart</h2>
+  <canvas *ngIf="timesData != undefined"
+          baseChart
+          [data]="barChartData"
+          [labels]="barChartLabels"
+          [chartType]="chartType"
+          [options]="barChartOptions"
+          id="chart"
+          >
+
+          <!--[legend]="barChartLegend"-->
+          <!--(chartHover)="chartHovered($event)"-->
+          <!--(chartClick)="chartClicked($event)"-->
+  </canvas>
+  <h2>News</h2>
+  <div class="card mb-3" *ngFor="let data of timesData">
+    <div class="card-block">
+      <h4 class="card-title">{{data.title}} </h4>
+      <h6 class="card-subtitle mb-2 text-muted">{{ data.date }}</h6>
+      <p class="card-text">
+        <b>Publisher:</b>{{ data.author }}<br>
+        <b>Link:</b><a href="{{ data.link }}">{{ data.link }}</a><br>
+        <b>Sentimental polarity of this article:</b>{{ data.polarity }}
+      </p>
+      <a href="#" class="card-link">Card link</a>
+      <a href="#" class="card-link">Another link</a>
+    </div>
+  </div>
+</div>
+

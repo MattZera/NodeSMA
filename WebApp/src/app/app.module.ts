@@ -11,6 +11,7 @@ import { AnalysisComponent } from './analysis/analysis.component';
 import { SocketService } from "./services/socket.service";
 import { LiveStreamComponent } from './live-stream/live-stream.component';
 import { LaTimesComponent } from './la-times/la-times.component';
+import { ChartsModule } from "ng2-charts/index";
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { LaTimesComponent } from './la-times/la-times.component';
     FormsModule,
     routing,
     HttpModule,
-    CollapseModule
+    CollapseModule,
+    ChartsModule
   ],
   providers: [SocketService],
   bootstrap: [AppComponent]

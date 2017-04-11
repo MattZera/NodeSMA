@@ -52,7 +52,7 @@ var termMap = new LRUCache(lru_options);
 var trackPhrasesSubject = new Rx.Subject();
 
 //the trending phrases in the US every 15 seconds
-var trendingPhrases = Rx.Observable.interval(15000)
+var trendingPhrases = Rx.Observable.interval(15000).startWith(-1)
     .switchMapTo(searchClient.get('trends/place',{id:23424977}))
     .concatMap(data=>Rx.Observable.from(data[0].trends))
     .map(trend=>trend.name);
@@ -72,8 +72,8 @@ var phrasesListStream = Rx.Observable
 
 //start the twitter stream
 var streamObservable = phrasesListStream
-    .sample(Rx.Observable.interval(1000 * 60 * 15).startWith(-1))
-    .distinctUntilChanged()
+    .sample(Rx.Observable.timer(-1, 1000).concat(Rx.Observable.interval(1000 * 60 * 15))) //resample every 15 minutes and start right now
+    .distinctUntilChanged() //dont reset the stream if the terms havn't changed
     .switchMap(
         terms =>
             Rx.Observable.fromEvent(
@@ -150,7 +150,7 @@ messages.subscribe(message=>{
             execFileObservable(
                 'python3',
                 ['-W ignore', __dirname+'/scripts/latimes.py']
-            ).subscribe(data=>send('times_data',data));
+            ).subscribe(data=>send('times_data', JSON.parse(data[0])));
         default:
             break;
     }
