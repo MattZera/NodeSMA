@@ -7,14 +7,18 @@ const searcher = require('./searcher');
 module.exports = function(server){
     var io = socketio(server);
 
-
-    searcher.messages.filter(message=>message.message=='tweet').subscribe(message=>{
-        io.emit('tweet', message.data);
+    searcher.messages.subscribe(message=>{
+        io.emit(message.message, message.data);
     });
     searcher.startStream();
 
-    io.use(function(socket, next){
+    io.on('connection', function(client){
+        client.on('get_times', ()=>{
+            searcher.getTimes();
+        });
+    });
 
+    io.use(function(socket, next){
         next();
     });
 

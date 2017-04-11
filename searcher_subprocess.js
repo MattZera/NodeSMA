@@ -66,14 +66,13 @@ var phrasesListStream = Rx.Observable
 
         return termMap.keys();
     });
-
 //
 //Twitter stream
 //
 
 //start the twitter stream
 var streamObservable = phrasesListStream
-    .sample(Rx.Observable.interval(1000 * 60 * 15).startWith(0))
+    .sample(Rx.Observable.interval(1000 * 60 * 15).startWith(-1))
     .distinctUntilChanged()
     .switchMap(
         terms =>
@@ -141,13 +140,17 @@ messages.subscribe(message=>{
                 process.send({message:"tweet",data:data});
             });
             send('stream_started');
-            trackPhrasesSubject.next('twitter');
 
             break;
         case "stop_stream":
             if (!streamSubscription) break;
             streamSubscription.unsubscribe();
             break;
+        case "get_times":
+            execFileObservable(
+                'python3',
+                ['-W ignore', __dirname+'/scripts/latimes.py']
+            ).subscribe(data=>send('times_data',data));
         default:
             break;
     }

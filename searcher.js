@@ -15,6 +15,7 @@ var messageObservable = Rx.Observable.fromEvent(searcher, 'message');
 exports.startStream = ()=>send("start_stream");
 exports.stopStream = ()=>send("stop_stream");
 exports.search = (term)=>send("search",term);
+exports.getTimes = ()=>send("get_times");
 
 exports.disconnect = function(){
     searcher.disconnect();
