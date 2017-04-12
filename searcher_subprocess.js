@@ -136,9 +136,9 @@ messages.subscribe(message=>{
     switch (message.message){
         case "start_stream":
             if (streamSubscription) break;
-            var streamSubscription = streamAnalysis.subscribe(data=>{
-                process.send({message:"tweet",data:data});
-            });
+            // var streamSubscription = streamAnalysis.subscribe(data=>{
+            //     process.send({message:"tweet",data:data});
+            // });
             send('stream_started');
 
             break;
