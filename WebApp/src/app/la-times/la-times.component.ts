@@ -13,7 +13,7 @@ export class LaTimesComponent implements OnInit, OnDestroy {
   timesData: Array<any>;
   subscription: Subscription;
 
-  barChartData: any;
+  barChartData: Array<any>;
   barChartLabels: Array<any>;
   chartType: any;
   barChartOptions: any;
@@ -37,7 +37,7 @@ export class LaTimesComponent implements OnInit, OnDestroy {
 
     this.subscription = this.socket.messages('times_data').subscribe(tdata=>{
       let labels: Array<any> = [];
-      let dataSet: Array<any> = [];
+      let dataSet: Array<number> = [];
 
       for (let data of tdata ){
         labels.push(data.date);
@@ -45,7 +45,7 @@ export class LaTimesComponent implements OnInit, OnDestroy {
       }
 
       this.barChartLabels = labels;
-      this.barChartData = {data:dataSet};
+      this.barChartData = [{data:dataSet, label:'Polarity'}];
 
       this.timesData=tdata;
     });

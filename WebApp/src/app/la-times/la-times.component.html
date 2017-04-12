@@ -11,7 +11,7 @@
   <h2>Chart</h2>
   <canvas *ngIf="timesData != undefined"
           baseChart
-          [data]="barChartData"
+          [datasets]="barChartData"
           [labels]="barChartLabels"
           [chartType]="chartType"
           [options]="barChartOptions"
