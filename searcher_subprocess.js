@@ -52,7 +52,7 @@ var termMap = new LRUCache(lru_options);
 var trackPhrasesSubject = new Rx.Subject();
 
 //the trending phrases in the US every 15 seconds
-var trendingPhrases = Rx.Observable.interval(15000).startWith(-1)
+var trendingPhrases = Rx.Observable.timer(0, 1000 * 15)
     .switchMapTo(searchClient.get('trends/place',{id:23424977}))
     .concatMap(data=>Rx.Observable.from(data[0].trends))
     .map(trend=>trend.name);
@@ -63,20 +63,22 @@ var phrasesListStream = Rx.Observable
     .flatMap(x=>x,(stream, term, streamNum,termNum)=>{
         var maxAge = streamNum == 1 ? 1000 * 60 * 60 : undefined;
         termMap.set(term, true, maxAge);
-
         return termMap.keys();
     });
+
 //
 //Twitter stream
 //
 
 //start the twitter stream
 var streamObservable = phrasesListStream
-    .sample(Rx.Observable.timer(-1, 1000).concat(Rx.Observable.interval(1000 * 60 * 15))) //resample every 15 minutes and start right now
+    .sample(Rx.Observable.timer(1000, 1000 * 60 * 60)) //resample every hour but start right now
     .distinctUntilChanged() //dont reset the stream if the terms havn't changed
     .switchMap(
-        terms =>
-            Rx.Observable.fromEvent(
+        terms =>{
+        console.log('changing stream');
+
+            return Rx.Observable.fromEvent(
                 streamClient.stream('statuses/filter',
                     {
                         track:terms.toString(), //Array tostring naturally inserts a ',' between strings
@@ -85,7 +87,7 @@ var streamObservable = phrasesListStream
                         filter_level: "none"
                     }),
                 'data'
-            )
+            );}
     ).publish(); //publish to only allow one stream
 
 var tweetStream = streamObservable.refCount().filter(tweet=> typeof tweet.text == 'string');
@@ -125,32 +127,39 @@ var streamSubscription;
 //Messaages
 //
 
-function send(message, data){
-    process.send({message:message, data:data});
+function send(message, data, id){
+    process.send({message:message, data:data, id:id});
 }
 
 //handle messages to and from the process
 var messages = Rx.Observable.fromEvent(process, 'message');
 messages.subscribe(message=>{
-    console.log('subprocess message: ' + message.message);
+    console.log('subprocess message: ' + message.message + " from: " + (message.id ? message.id : "Server") );
     switch (message.message){
         case "start_stream":
             if (streamSubscription) break;
-            // var streamSubscription = streamAnalysis.subscribe(data=>{
-            //     process.send({message:"tweet",data:data});
-            // });
+            var streamSubscription = streamAnalysis.subscribe(data=>{
+                process.send({message:"tweet", data:data});
+            });
             send('stream_started');
-
             break;
         case "stop_stream":
             if (!streamSubscription) break;
             streamSubscription.unsubscribe();
             break;
+        case "get_tracked_phrases":
+            send('tracked_phrases', termMap.keys(), message.id);
+            break;
         case "get_times":
             execFileObservable(
                 'python3',
                 ['-W ignore', __dirname+'/scripts/latimes.py']
-            ).subscribe(data=>send('times_data', JSON.parse(data[0])));
+            ).subscribe(data=>send('times_data', JSON.parse(data[0]), message.id));
+            break;
+        case "search":
+            Rx.Observable.fromPromise(searchClient.get('search/tweets',{q:message.data, result_type: 'recent', count:100}))
+            .subscribe(data=>send("search_result", data, message.id));
+            break;
         default:
             break;
     }

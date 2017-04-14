@@ -12,6 +12,7 @@ import { SocketService } from "./services/socket.service";
 import { LiveStreamComponent } from './live-stream/live-stream.component';
 import { LaTimesComponent } from './la-times/la-times.component';
 import { ChartsModule } from "ng2-charts/index";
+import { TrackedPhrasesComponent } from './tracked-phrases/tracked-phrases.component';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { ChartsModule } from "ng2-charts/index";
     HomeComponent,
     AnalysisComponent,
     LiveStreamComponent,
-    LaTimesComponent
+    LaTimesComponent,
+    TrackedPhrasesComponent
   ],
   imports: [
     BrowserModule,

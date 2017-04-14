@@ -5,6 +5,7 @@ import pandas as pd
 import operator
 import json
 
+
 def main():
     # fetch xml
     with urllib.request.urlopen('http://www.latimes.com/local/lanow/rss2.0.xml') as url:
@@ -34,6 +35,7 @@ def main():
     json_f = df.reset_index().to_json(orient='records')
 
     print(json_f)
+
 
 # start process
 if __name__ == '__main__':

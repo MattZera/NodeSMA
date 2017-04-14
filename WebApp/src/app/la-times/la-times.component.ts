@@ -11,7 +11,6 @@ import {SocketService} from "../services/socket.service";
 export class LaTimesComponent implements OnInit, OnDestroy {
 
   timesData: Array<any>;
-  subscription: Subscription;
 
   barChartData: Array<any>;
   barChartLabels: Array<any>;
@@ -34,8 +33,7 @@ export class LaTimesComponent implements OnInit, OnDestroy {
       }
     };
 
-
-    this.subscription = this.socket.messages('times_data').subscribe(tdata=>{
+    this.socket.messages('times_data').take(1).subscribe(tdata=>{
       let labels: Array<any> = [];
       let dataSet: Array<number> = [];
 
@@ -48,12 +46,12 @@ export class LaTimesComponent implements OnInit, OnDestroy {
       this.barChartData = [{data:dataSet, label:'Polarity'}];
 
       this.timesData=tdata;
+
     });
     this.socket.send('get_times');
   }
 
   ngOnDestroy(){
-    this.subscription.unsubscribe();
   }
 
 }

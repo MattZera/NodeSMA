@@ -8,10 +8,6 @@
       <env name="TWITTER_ACCESS_TOKEN_SECRET" value="be1aMDTnZ6x53vvHs4kNL6OIBxVuXjS8N5MzA9lNgXuHv" />
       <env name="TWITTER_BEARER_TOKEN" value="AAAAAAAAAAAAAAAAAAAAAHzZzQAAAAAA3d%2FRpNR3dF39ELtzbkhieaGSh%2F8%3Djw2jKhNba6psfdH3qzEUcZWBiFWj7MHJMOQTQ9V5QgLWfSzlvv" />
     </envs>
-    <profiling v8-profiler-path="" />
-    <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSProfilingRunConfigurationExtension">
-      <profiling v8-profiler-path="" />
-    </EXTENSION>
     <method />
   </configuration>
 </component>

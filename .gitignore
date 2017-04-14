@@ -130,3 +130,5 @@ fabric.properties
 
 #nltk
 /scripts/nltk_data/*
+/scripts/training_sets/
+/scripts/naive-bayes-data.json

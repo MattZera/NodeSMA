@@ -8,13 +8,22 @@ module.exports = function(server){
     var io = socketio(server);
 
     searcher.messages.subscribe(message=>{
-        io.emit(message.message, message.data);
+        if (message.id){
+            io.to(message.id).emit(message.message, message.data);
+        }else{
+            io.emit(message.message, message.data);
+        }
     });
-    searcher.startStream();
+
+    searcher.send('start_stream');
 
     io.on('connection', function(client){
+        console.log(client.rooms);
         client.on('get_times', ()=>{
-            searcher.getTimes();
+            searcher.send("get_times", {}, client.id)
+        });
+        client.on('get_tracked_phrases', ()=>{
+            searcher.send("get_tracked_phrases", {}, client.id)
         });
     });
 

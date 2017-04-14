@@ -1,0 +1,17 @@
+<div class="container">
+  <h1>Currently Tracked Terms</h1>
+  <hr>
+  <div class="card mb-3" *ngFor="let phrase of trackedPhrases | async">
+    <div class="card-block">
+      <h4 class="card-title">{{phrase}}</h4>
+      <!--<h6 class="card-subtitle mb-2 text-muted">{{ data.date }}</h6>-->
+      <!--<p class="card-text">-->
+        <!--<b>Publisher:</b>{{ data.author }}<br>-->
+        <!--<b>Link:</b><a href="{{ data.link }}">{{ data.link }}</a><br>-->
+        <!--<b>Sentimental polarity of this article:</b>{{ data.polarity }}-->
+      <!--</p>-->
+      <!--<a href="#" class="card-link">Card link</a>-->
+      <!--<a href="#" class="card-link">Another link</a>-->
+    </div>
+  </div>
+</div>
