@@ -6,7 +6,7 @@ const cp = require('child_process');
 const Rx = require('rxjs/Rx');
 const Twitter = require('twitter');
 const LRUCache = require("lru-cache");
-//const db = require('../database')('mongodb://localhost:27017/SMA');
+//const db = require('./database')('mongodb://localhost:27017/SMA');
 
 //
 //Twitter Api
@@ -93,16 +93,13 @@ var streamObservable = phrasesListStream
 var tweetStream = streamObservable.refCount().filter(tweet=> typeof tweet.text == 'string');
 //var messageStream = streamObservable.filter(tweet => tweet.text == undefined).subscribe(message=>console.error(message));
 
-
 //Create execFileObservable from execFile
 var execFileObservable = Rx.Observable.bindNodeCallback(cp.execFile);
 
 //launch a python process to analyze each tweet and flatmap the returns to the same observable
 var streamAnalysis = tweetStream
     .map(tweet=>{
-
         var text = tweet.truncated == true ? tweet.extended_tweet.full_text : tweet.text
-
         return {
             text:text,
             user:{
@@ -118,9 +115,40 @@ var streamAnalysis = tweetStream
             ['-W ignore', __dirname+'/scripts/analyser_textblob.py', JSON.stringify(data.text) ]
         ),
         (x, y, ix, iy) => { x.sentiment = JSON.parse(y[0]); return x}
-    ).share();
+    ).map(tweet=>{
 
-var streamSubscription;
+        tweet.sma_keywords = [];
+        for(var key of termMap.keys()){
+            if (tweet.text.toLowerCase().includes(key.toLowerCase())){
+                tweet.sma_keywords.push(key)
+            }
+        }
+        return tweet;
+        }
+    ).publish();
+
+var streamSubscription = streamAnalysis.subscribe(data=>{
+    process.send({message:"tweet", data:data});
+});
+
+var dbSubscription = streamAnalysis.groupBy(tweet=>tweet.sma_keywords[0])
+    .flatMap(obs=>{
+        var key = obs.key;
+        var total = 3;
+        return obs.windowCount(total)
+            .flatMap(
+                obs=>
+                    obs.map(
+                        tweet=>
+                            tweet.sentiment.compound > 0 ? 1 : 0
+                    ).count(x=>x==1))
+            .map(
+                count=> {
+                    return {phrase:key, count:count, total:total};
+                }
+            );
+
+    }).subscribe(data=>console.log(data));
 
 
 //
@@ -137,10 +165,7 @@ messages.subscribe(message=>{
     console.log('subprocess message: ' + message.message + " from: " + (message.id ? message.id : "Server") );
     switch (message.message){
         case "start_stream":
-            if (streamSubscription) break;
-            var streamSubscription = streamAnalysis.subscribe(data=>{
-                process.send({message:"tweet", data:data});
-            });
+            streamAnalysis.connect();
             send('stream_started');
             break;
         case "stop_stream":
@@ -157,7 +182,12 @@ messages.subscribe(message=>{
             ).subscribe(data=>send('times_data', JSON.parse(data[0]), message.id));
             break;
         case "search":
-            Rx.Observable.fromPromise(searchClient.get('search/tweets',{q:message.data, result_type: 'recent', count:100}))
+            Rx.Observable.fromPromise(searchClient.get('search/tweets',{
+                q:message.data,
+                result_type: 'recent',
+                count:100,
+                language: "en"
+            }))
             .subscribe(data=>send("search_result", data, message.id));
             break;
         default:

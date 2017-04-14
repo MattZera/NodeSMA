@@ -2,9 +2,10 @@
 <div class="jumbotron">
   <div class="container">
     <h1 class="display-3">Social Media Analyzer</h1>
-    <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+    <p>An online tool for everyone who's every been curious about public opinion. <br>
+      Click one of the links or search to get insight into current trends!</p>
     <div class="input-group">
-      <input #searchbox type="text" class="form-control" placeholder="Search Text" (keyup.enter)="go(searchbox.value)">
+      <input #searchbox type="text" class="form-control" placeholder="Search Phrase" (keyup.enter)="go(searchbox.value)">
       <div class="input-group-btn">
         <a class="btn btn-primary btn-lg" role="button" (click)="go(searchbox.value)">GO</a>
       </div>
@@ -15,22 +16,11 @@
 <div class="container">
   <!-- Example row of columns -->
   <div class="row">
-    <div class="col-md-4">
-      <h2>Heading</h2>
-      <p>This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text!</p>
-      <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-      <h2>Heading</h2>
-      <p>This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text!</p>
-      <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-      <h2>Heading</h2>
-      <p>This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text! This is example text!</p>
-      <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+    <div *ngFor="let tweet of tweets | async" class="col-md-4">
+      <h2>@{{tweet.user.screen_name}}</h2>
+      <p>{{tweet.text}}</p>
+      <p><a class="btn btn-secondary" routerLink="/analysis/{{tweet.sma_keywords[0]}}" role="button">{{tweet.sma_keywords[0]}}</a></p>
     </div>
   </div>
-
   <hr>
 </div> <!-- /container -->

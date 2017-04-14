@@ -1,9 +1,10 @@
 <div class="container">
   <h1>Currently Tracked Terms</h1>
+  <p>This is a list of the terms we're currently tracking in our live stream. Click on a link!</p>
   <hr>
   <div class="card mb-3" *ngFor="let phrase of trackedPhrases | async">
     <div class="card-block">
-      <h4 class="card-title">{{phrase}}</h4>
+      <h4 class="card-title"><a routerLink="/analysis/{{phrase}}">{{phrase}}</a></h4>
       <!--<h6 class="card-subtitle mb-2 text-muted">{{ data.date }}</h6>-->
       <!--<p class="card-text">-->
         <!--<b>Publisher:</b>{{ data.author }}<br>-->

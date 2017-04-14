@@ -19,11 +19,14 @@ module.exports = function(server){
 
     io.on('connection', function(client){
         console.log(client.rooms);
-        client.on('get_times', ()=>{
+        client.on('get_times', (data)=>{
             searcher.send("get_times", {}, client.id)
         });
-        client.on('get_tracked_phrases', ()=>{
+        client.on('get_tracked_phrases', (data)=>{
             searcher.send("get_tracked_phrases", {}, client.id)
+        });
+        client.on('search', (data)=>{
+            searcher.send("search", data, client.id)
         });
     });
 

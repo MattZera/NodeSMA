@@ -1,3 +1,25 @@
-<p>
-  analysis works! The keyword is {{keyword}}
-</p>
+<div class="container">
+  <h1>{{keyword}}</h1>
+  <hr>
+
+
+  <div id="tweetBox">
+    <h2>Tweets about "{{keyword}}" right Now</h2>
+    <h3 *ngIf="!tweets | async">Loading...</h3>
+    <div class="container-fluid">
+      <div *ngFor="let tweet of tweets | async; let i = index; let even = even">
+        <div [class.card-success]="tweet.sentiment.compound > 0"
+             [class.card-danger]="tweet.sentiment.compound < 0"
+             [class.card-primary]="tweet.sentiment.compound == 0"
+             class="card mb-3 text-center card-inverse col">
+          <div class="card-block">
+            <h3 class="card-title">@{{tweet.user.screen_name}}</h3>
+            <p class="card-text">{{ tweet.text }}</p>
+          </div>
+        </div>
+        <div *ngIf="even == true" class="w-100"></div>
+      </div>
+    </div>
+  </div>
+</div> <!-- /container -->
+
