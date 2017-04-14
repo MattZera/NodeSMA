@@ -61,7 +61,7 @@ var trendingPhrases = Rx.Observable.timer(0, 1000 * 15)
 var phrasesListStream = Rx.Observable
     .from([trackPhrasesSubject,trendingPhrases])
     .flatMap(x=>x,(stream, term, streamNum,termNum)=>{
-        var maxAge = streamNum == 1 ? 1000 * 60 * 60 : undefined;
+        var maxAge = streamNum == 1 ? 1000 * 60 * 60 * 2 : undefined;
         termMap.set(term, true, maxAge);
         return termMap.keys();
     });
